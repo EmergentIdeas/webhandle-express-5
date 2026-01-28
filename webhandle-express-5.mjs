@@ -40,6 +40,7 @@ export default class WebhandleExpress5 extends Webhandle {
 	 */
 	addStaticDir(path,  {urlPrefix, fixedSetOfFiles} = {}) {
 		let info = super.addStaticDir(path, {urlPrefix, fixedSetOfFiles});
+		fixedSetOfFiles = info.fixedSetOfFiles
 
 		let router = serveStatic(info.path)
 		if(fixedSetOfFiles) {
