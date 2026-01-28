@@ -36,15 +36,12 @@ export default class WebhandleExpress5 extends Webhandle {
 	 * @param {string} [options.fixedSetOfFiles] If true, it will be assumed that the resources are at a
 	 * fixed, known set of URLs. That is, if a url can't be found the first time it's searched for
 	 * it would be found subsequent times either. This let's us optimize server files from libraries
-	 * or otherwise unchanging sets.
+	 * or otherwise unchanging sets. This is assumed true if `development` is not true.
 	 */
 	addStaticDir(path,  {urlPrefix, fixedSetOfFiles} = {}) {
-		path = this.getAbsolutePathFromProjectRelative(path)
+		let info = super.addStaticDir(path, {urlPrefix, fixedSetOfFiles});
 
-		let info = {urlPrefix, fixedSetOfFiles, path}
-		this.staticDirs.push(info)
-
-		let router = serveStatic(path)
+		let router = serveStatic(info.path)
 		if(fixedSetOfFiles) {
 			info.innerRouter = router
 			let wrapped = createRememberPassingRouter(router)
