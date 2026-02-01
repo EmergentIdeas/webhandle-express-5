@@ -15,8 +15,7 @@ await webhandle.init()
 addStandardMiddleware(webhandle)
 
 
-await wait(300)
-await listenOnHttpServer(webhandle)
+listenOnHttpServer(webhandle)
 
 let testdir = 'test' + (new Date().getTime())
 let testpath = '/tmp/' + testdir
@@ -31,7 +30,7 @@ webhandle.addStaticDir(testpath, {
 let oneData = 'abc'
 await fsTest.write('one.txt', oneData)
 
-test("fetch static contents", async (t) => {
+await test("fetch static contents", async (t) => {
 	await t.test('prefixed files', async (t) => {
 		let response = await fetch('http://localhost:3000/one.txt')
 		let body = await response.text()
@@ -44,7 +43,6 @@ test("fetch static contents", async (t) => {
 	
 	await t.test('shutdown', async (t) => {
 		webhandle.server.close()
-		await wait(300)
 		await fsTmp.rm(testdir)
 	})
 	

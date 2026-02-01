@@ -30,10 +30,9 @@ webhandle.routers.primary.use((req, res, next) => {
 	res.end('after error hello')
 })
 
-await wait(3000)
-await listenOnHttpServer(webhandle)
+listenOnHttpServer(webhandle)
 
-test("check render results", async (t) => {
+await test("check render results", async (t) => {
 	await t.test('express direct render', async (t) => {
 		let response = await fetch('http://localhost:3000/one')
 		let body = await response.text()
@@ -42,7 +41,6 @@ test("check render results", async (t) => {
 
 	await t.test('shutdown', async (t) => {
 		webhandle.server.close()
-		await wait(300)
 	})
 })
 

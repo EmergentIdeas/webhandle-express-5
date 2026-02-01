@@ -29,10 +29,9 @@ webhandle.routers.primary.post('/file-parameters', (req, res, next) => {
 	res.json({ msg: 'Uploaded' })
 })
 
-await wait(300)
-await listenOnHttpServer(webhandle)
+listenOnHttpServer(webhandle)
 
-test("check parameter parsing", async (t) => {
+await test("check parameter parsing", async (t) => {
 	await t.test('query parameters', async (t) => {
 		let response = await fetch('http://localhost:3000/query-parameters?name=Dan&position=chair')
 		let result = await response.json()
@@ -95,7 +94,6 @@ test("check parameter parsing", async (t) => {
 
 	await t.test('shutdown', async (t) => {
 		webhandle.server.close()
-		await wait(300)
 	})
 
 })
