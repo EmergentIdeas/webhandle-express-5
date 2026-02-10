@@ -11,9 +11,14 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@webhandle/core": "github:EmergentIdeas/webhandle-core",
+    "@webhandle/core": "^1.0.1",
     "cookie-parser": "^1.4.7",
     "express": "^5.2.1",
     "multer": "^2.0.2"
   }
+  , "files": [
+	"README.md"
+	, "*.mjs"
+	, "lib"
+  ]
 }
