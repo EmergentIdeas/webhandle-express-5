@@ -45,6 +45,12 @@ webhandle.routers.primary.get('/three', (req, res, next) => {
 	res.render('something-3')
 })
 
+webhandle.routers.primary.get('/four', async (req, res, next) => {
+	console.log('start four')
+	let response = await webhandle.render('something-3')
+	console.log(`four: ${response}`)
+	res.end(response)
+})
 
 listenOnHttpServer(webhandle)
 
@@ -63,6 +69,12 @@ await test("check render results", async (t) => {
 	})
 	await t.test('response render', async (t) => {
 		let response = await fetch('http://localhost:3000/three')
+		let body = await response.text()
+		let fileContent = await fs.readFile('./test-data/views/something-3.ntl')
+		assert.equal(body, fileContent, 'Result did not match template')
+	})
+	await t.test('invoked render', async (t) => {
+		let response = await fetch('http://localhost:3000/four')
 		let body = await response.text()
 		let fileContent = await fs.readFile('./test-data/views/something-3.ntl')
 		assert.equal(body, fileContent, 'Result did not match template')

@@ -26,7 +26,7 @@ export default class WebhandleExpress5 extends Webhandle {
 	createAppRouter() {
 		return express()
 	}
-	
+
 	/**
 	 * Serves static files from the path specified.
 	 * @param {string} path 
@@ -38,27 +38,27 @@ export default class WebhandleExpress5 extends Webhandle {
 	 * it would be found subsequent times either. This let's us optimize server files from libraries
 	 * or otherwise unchanging sets. This is assumed true if `development` is not true.
 	 */
-	addStaticDir(path,  {urlPrefix, fixedSetOfFiles} = {}) {
-		let info = super.addStaticDir(path, {urlPrefix, fixedSetOfFiles});
+	addStaticDir(path, { urlPrefix, fixedSetOfFiles } = {}) {
+		let info = super.addStaticDir(path, { urlPrefix, fixedSetOfFiles });
 		fixedSetOfFiles = info.fixedSetOfFiles
 
 		let router = serveStatic(info.path)
-		if(fixedSetOfFiles) {
+		if (fixedSetOfFiles) {
 			info.innerRouter = router
 			let wrapped = createRememberPassingRouter(router)
 			wrapped.router = router
 			router = wrapped
 		}
-		
+
 		info.router = router
-		
-		if(!urlPrefix) {
+
+		if (!urlPrefix) {
 			this.routers.staticServers.use(router)
 		}
 		else {
 			this.routers.staticServers.use(urlPrefix, router)
 		}
-		
+
 		return info
 	}
 
@@ -71,43 +71,52 @@ export default class WebhandleExpress5 extends Webhandle {
 	 * @returns A promise which resolves to the rendered template content if no destination wtream is specified
 	 */
 	async render(templateName, data, callback, destination) {
-		if (typeof data === 'function') {
-			callback = data
-			data = undefined
-		}
-		else if (isStream(data)) {
-			destination = data
-			data = callback = undefined
-		}
-		else {
-			if (isStream(callback)) {
-				destination = callback
-				callback = undefined
+		return new Promise((resolve, reject) => {
+			if (typeof data === 'function') {
+				callback = data
+				data = {}
 			}
-		}
+			else if (isStream(data)) {
+				destination = data
+				callback = undefined
+				data = {}
+			}
+			else {
+				if (isStream(callback)) {
+					destination = callback
+					callback = undefined
+				}
+			}
+			if (data === null || data === undefined) {
+				data = {}
+			}
 
-		return this.app.render(templateName, data, (err, content) => {
-			if (destination) {
-				destination.write(content)
-				if (callback) {
+			let expressRenderCallback = (err, content) => {
+				if (destination) {
+					destination.write(content)
+					if (callback) {
+						try {
+							callback()
+						}
+						catch (e) {
+						}
+					}
+				}
+				else if (callback) {
 					try {
-						callback()
+						callback(err, content)
 					}
 					catch (e) {
 					}
-					return
 				}
-				else {
-					return
+				if(err) {
+					return reject(err)
 				}
+
+				resolve(content)
 			}
-			else if (callback) {
-				try {
-					callback(err, content)
-				}
-				catch (e) {
-				}
-			}
+
+			this.app.render(templateName, data, expressRenderCallback)
 		})
 	}
 }
