@@ -1,6 +1,6 @@
 {
   "name": "@webhandle/express-5",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "setup-express-5.mjs",
   "scripts": {
